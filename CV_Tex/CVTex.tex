@@ -1,0 +1,102 @@
+\documentclass[10pt,a4paper]{article}
+
+\usepackage[a4paper,margin=0.55in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[hidelinks]{hyperref}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{parskip}
+\usepackage{xcolor}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.25em}
+\setlist[itemize]{leftmargin=1.2em, itemsep=0.12em, topsep=0.12em, parsep=0pt, partopsep=0pt}
+\titleformat{\section}{\large\bfseries}{}{0pt}{}[\titlerule]
+\titlespacing*{\section}{0pt}{0.6em}{0.35em}
+\linespread{0.95}
+\hypersetup{colorlinks=true, urlcolor=blue}
+
+\begin{document}
+
+\begin{center}
+    {\LARGE \textbf{Yu Zhang}}\\[0.4em]
+    GitHub: \href{https://github.com/CorradoZhang}{CorradoZhang} \,|\, E-mail: \href{mailto:Y.Zhang34@universityofgalway.ie}{Y.Zhang34@universityofgalway.ie} \,|\, LinkedIn: \href{https://www.linkedin.com/in/yu-zhang-ml-rl-rbt/}{yu-zhang-ml-rl-rbt}
+\end{center}
+
+\section*{Educational Background}
+
+\textbf{University of Galway} \hfill Galway, Ireland\\
+\textit{Ph.D.\ in Computer Science} \hfill Sept 2025 -- Sept 2029 (expected)
+
+\textbf{University of Galway} \hfill Galway, Ireland\\
+\textit{M.Sc.\ in Computer Science -- Artificial Intelligence (First Class Honours)} \hfill Sept 2024 -- Sept 2025
+
+\textbf{Heilongjiang University of Science and Technology} \hfill Harbin, China\\
+\textit{B.Eng.\ in Computer Science and Technology (Major Degree)} \hfill Oct 2020 -- Jun 2024\\
+GPA: 3.55 (85.5\%)
+
+\textit{B.Sc.\ in Mathematics and Applied Mathematics (Minor Degree)}\\
+GPA: 3.75 (87.5\%)
+
+\section*{Research Interests}
+
+Reinforcement Learning, Robotics
+
+\section*{Research Paper}
+
+\begin{itemize}
+    \item \textbf{Yu Zhang}, Karl Mason. ``D-SPEAR: Dual-Stream Prioritized Experience Adaptive Replay for Stable Reinforcement Learning in Robotic Manipulation.'' \textit{arXiv:2603.27346}, 2026. (Accepted at ICCRE 2026), [\href{https://arxiv.org/abs/2603.27346}{Link}]
+\end{itemize}
+
+\section*{Research \& Project Experience}
+
+\textbf{D-SPEAR: Dual-Stream Prioritized Experience Adaptive Replay for Stable Reinforcement Learning in Robotic Manipulation} \hfill Oct 2025 -- Mar 2026\\
+GitHub: \href{https://github.com/CorradoZhang/D-SPEAR-Code-and-Result}{https://github.com/CorradoZhang/D-SPEAR-Code-and-Result}
+\begin{itemize}
+    \item Designed and implemented D-SPEAR, a Soft Actor-Critic based reinforcement learning algorithm with a dual-stream prioritized replay mechanism, emphasizing high-TD samples for the critic, low-TD samples for the actor, and a shared anchor subset to stabilize updates across both branches.
+    \item Implemented an adaptive replay coefficient $\lambda$ to adjust the balance between uniform and prioritized sampling based on the coefficient of variation of TD errors; additionally integrated candidate-ratio sampling and Huber critic loss to improve robustness and reward-scale adaptability.
+    \item Built a robotic manipulation benchmark pipeline with robosuite and conducted 5-seed experiments on Lift and Door; measured by the mean return over the last 10 episodes, D-SPEAR achieved 305.4 on Lift, outperforming the best baseline TD3 (164.9) by 85.3\% and SAC (156.9) by 94.7\%.
+    \item Completed the full research workflow including ablation studies, parallel multi-seed training, result aggregation, and publication-ready visualization; on Lift, removing the dual-stream design, low-TD actor sampling, or high-TD critic sampling reduced the mean return to 199.9, 179.0, and 184.2, corresponding to drops of about 34.6\%, 41.4\%, and 39.7\% from the full model (305.4), validating the effectiveness of the core design.
+\end{itemize}
+
+\textbf{Design of Crack Detection System for USTH Road Based on Image Processing} \hfill Harbin, China\\
+\textit{Graduation Capstone Project for B.Eng.\ in Computer Science and Technology, Score: 93/100 (Rank: 1/158)}
+\begin{itemize}
+    \item Developed a Python-based road crack image collection system, enabling automated image capture both inside and outside the Heilongjiang University of Science and Technology campus.
+    \item Designed an image processing system in MATLAB to process and display collected images, incorporating techniques such as histogram equalization and binary filtering.
+    \item Implemented automatic crack severity classification and task assignment to relevant personnel.
+    \item Built a web-based platform using Vue.js and Spring Boot, supporting CRUD operations for road crack data and improving usability for maintenance teams.
+\end{itemize}
+
+\section*{Extracurricular Activities \& Leadership}
+
+\textbf{Heilongjiang University of Science and Technology AI Association} \hfill Sep 2021 -- Sep 2022\\
+\textit{Technical Consultant, Training Group Leader}
+\begin{itemize}
+    \item Guided and mentored a team of 60+ junior members, focusing on practical skills in machine learning, data analysis, and model optimization.
+    \item Provided technical oversight for team-led AI projects through code reviews, algorithm optimization, and project presentations.
+    \item Fostered a collaborative learning environment by creating a knowledge-sharing platform, encouraging members to discuss challenges and share innovative solutions.
+\end{itemize}
+
+\section*{Awards \& Distinction}
+
+\begin{itemize}
+    \item Excellent Capstone Project (Rank: 1/158), Heilongjiang University of Science and Technology \hfill Jun 2024
+    \item Second Prize, The Chinese Mathematics Competition (CMC), China Mathematical Society \hfill Mar 2023
+    \item Second Prize, National English Competition for College Students (NECCS), International English Language Teachers Association \hfill Oct 2022
+    \item Second Prize, MathorCup National College Mathematical Modeling Challenge Competition, Chinese Society of Optimization, Overall Planning and Economic Mathematics \hfill Oct 2022
+    \item Third Prize, Lanqiao Cup National Software and Information Technology Professionals Competition, Talent Exchange Center Of Ministry Of Industry And Information Technology \hfill May 2022
+    \item Third Prize, MathorCup National College Mathematical Modeling Challenge Competition -- Big Data Competition, Chinese Society of Optimization, Overall Planning and Economic Mathematics \hfill Mar 2022
+    \item Third Prize, Northeast Three Provinces Mathematical Modeling League, Northeast Three Provinces Mathematical Modeling League Organizing Committee \hfill Aug 2021
+\end{itemize}
+
+\section*{Skills \& Language}
+
+\textbf{Programming Skills:} Python (Advanced), C (Advanced), Java (Intermediate)\\
+\textbf{Python Frameworks:} PyTorch, TensorFlow, Keras, Scikit-Learn, NumPy, Pandas, Matplotlib, Seaborn, SciPy\\
+\textbf{Professional Applications:} MATLAB, LINGO, SPSS, CoppeliaSim\\
+\textbf{Language:} English (Proficient, IELTS 6.5); Mandarin (Native)
+
+\end{document}
