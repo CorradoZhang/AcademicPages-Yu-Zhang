@@ -27,27 +27,24 @@ document.addEventListener("DOMContentLoaded", function () {
 
   var sidebarHost = document.querySelector("[data-profile-sidebar]");
   if (sidebarHost) {
-    var aboutEducation = "";
-    if (page === "about") {
-      aboutEducation =
-        '<div class="sidebar-section">' +
-        '<h3 class="sidebar-section-title">Education</h3>' +
-        '<div class="sidebar-education-list">' +
-        '<div class="sidebar-education-item">' +
-        '<strong>PhD in Computer Science</strong>' +
-        '<p>University of Galway, 2025–2029 (expected)</p>' +
-        "</div>" +
-        '<div class="sidebar-education-item">' +
-        '<strong>MSc in Computer Science</strong>' +
-        '<p>University of Galway, 2024–2025</p>' +
-        "</div>" +
-        '<div class="sidebar-education-item">' +
-        '<strong>BEng in CS &amp; BSc in Mathematics</strong>' +
-        '<p>Heilongjiang University of Science and Technology, 2020–2024</p>' +
-        "</div>" +
-        "</div>" +
-        "</div>";
-    }
+    var sidebarEducation =
+      '<div class="sidebar-section">' +
+      '<h3 class="sidebar-section-title">Education</h3>' +
+      '<div class="sidebar-education-list">' +
+      '<div class="sidebar-education-item">' +
+      '<strong>PhD in Computer Science</strong>' +
+      '<p>University of Galway, 2025–2029 (expected)</p>' +
+      "</div>" +
+      '<div class="sidebar-education-item">' +
+      '<strong>MSc in Computer Science</strong>' +
+      '<p>University of Galway, 2024–2025</p>' +
+      "</div>" +
+      '<div class="sidebar-education-item">' +
+      '<strong>BEng in CS &amp; BSc in Mathematics</strong>' +
+      '<p>Heilongjiang University of Science and Technology, 2020–2024</p>' +
+      "</div>" +
+      "</div>" +
+      "</div>";
 
     sidebarHost.innerHTML =
       '<aside class="sidebar" aria-label="Profile">' +
@@ -62,7 +59,7 @@ document.addEventListener("DOMContentLoaded", function () {
       '<li><i class="fa-brands fa-linkedin" aria-hidden="true"></i><a href="https://www.linkedin.com/in/yu-zhang-ml-rl-rbt/" target="_blank" rel="noreferrer">LinkedIn</a></li>' +
       '<li><i class="fa-solid fa-location-dot" aria-hidden="true"></i><span>Galway, Ireland</span></li>' +
       "</ul>" +
-      aboutEducation +
+      sidebarEducation +
       "</aside>";
   }
 

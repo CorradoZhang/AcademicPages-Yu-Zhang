@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=20260408">
 </head>
 
 <body data-page="research">
@@ -26,22 +26,56 @@
           <p>Current research directions in intelligent and autonomous systems.</p>
         </header>
 
-        <section class="content-section">
-          <h2 class="section-title"><i class="fa-solid fa-flask"></i>Research Overview</h2>
-          <hr class="section-divider">
-          <p>My research focuses on reinforcement learning and optimization methods for decision-making in uncertain environments. I am interested in how learning systems can be made robust, adaptive, and computationally efficient for use in autonomous agents and robotics.</p>
-        </section>
+        <div class="main-scroll">
+          <section class="content-section">
+            <h2 class="section-title"><i class="fa-solid fa-flask"></i>Research Overview</h2>
+            <hr class="section-divider">
+            <p>My research focuses on reinforcement learning and optimization methods for decision-making in uncertain environments. I am interested in how learning systems can be made robust, adaptive, and computationally efficient for use in autonomous agents and robotics.</p>
+          </section>
 
-        <section class="content-section">
-          <h2 class="section-title"><i class="fa-solid fa-list"></i>Current Themes</h2>
-          <hr class="section-divider">
-          <ul class="compact-list">
-            <li>Sample-efficient reinforcement learning</li>
-            <li>Optimization and evolutionary methods for policy improvement</li>
-            <li>Learning and control in robotics</li>
-            <li>Robust decision-making under uncertainty</li>
-          </ul>
-        </section>
+          <section class="content-section">
+            <h2 class="section-title"><i class="fa-solid fa-list"></i>Current Research Projects</h2>
+            <hr class="section-divider">
+            <article class="publication-entry publication-entry-inline">
+              <div class="publication-content">
+                <h3 class="publication-title">Modern Replay: Stable and High-Performance Sampling for Deep RL</h3>
+                <p class="project-date"><strong>Timeline:</strong> November 2025 - Present</p>
+                <p class="publication-authors"><strong>Status:</strong> In progress</p>
+                <p class="project-output"><strong>Current Output:</strong> <a href="publications.html#dspear-paper">D-SPEAR: Dual-Stream Prioritized Experience Adaptive Replay for Stable Reinforcement Learning in Robotic Manipulation</a></p>
+                <div class="publication-figure">
+                  <img src="Figures/Gemini_Generated_Image_yna5ffyna5ffyna5.png" alt="Concept image for Modern Replay project">
+                </div>
+                <p>Modern Replay is a research project focused on improving experience replay mechanisms to achieve both training stability and high performance in deep reinforcement learning. It introduces structured and adaptive sampling strategies that decouple optimization dynamics, reduce gradient variance, and enable more stable and efficient policy learning.</p>
+                <p class="project-details-label">Research Details</p>
+                <ul class="publication-meta-list">
+                  <li>Proposes a modern replay framework that improves both stability and performance via advanced sampling strategies.</li>
+                  <li>Introduces structured sampling mechanisms to balance different learning dynamics during training.</li>
+                  <li>Reduces gradient variance, leading to more stable optimization and better convergence behavior.</li>
+                  <li>Demonstrates consistent performance gains over standard replay methods on MuJoCo continuous control benchmarks.</li>
+                </ul>
+                <p class="meta"><strong>Technologies:</strong> Deep Reinforcement Learning · Experience Replay · Sampling Optimization · MuJoCo Simulation</p>
+              </div>
+            </article>
+
+            <article class="project-entry publication-entry-inline">
+              <h3 class="publication-title">HRL-MM: Hierarchical Reinforcement Learning for Mobile Manipulation in Simulation</h3>
+              <p class="project-date"><strong>Timeline:</strong> March 2026 - Present</p>
+              <p class="publication-authors"><strong>Status:</strong> In progress</p>
+              <div class="publication-figure">
+                <img src="Figures/CopSimShot.png" alt="CoppeliaSim mobile manipulation environment for HRL-MM project">
+              </div>
+              <p>This project presents a simulation-driven framework for mobile manipulation in cluttered environments, leveraging hierarchical reinforcement learning to decompose complex tasks into structured sub-problems. The system integrates perception, navigation, and manipulation within a unified learning framework, enabling efficient policy learning for long-horizon tasks.</p>
+              <p class="project-details-label">Research Details</p>
+              <ul class="publication-meta-list">
+                <li>Develops a CoppeliaSim-based simulation environment for mobile manipulation, supporting integrated navigation and grasping in cluttered scenes.</li>
+                <li>Incorporates a vision-based perception module for scene understanding and object localization, enabling the agent to operate in visually complex environments.</li>
+                <li>Constructs a complete inverse kinematics framework for a 6-DoF robotic arm, enabling accurate end-effector position control.</li>
+                <li>Implements a hierarchical reinforcement learning architecture that separates high-level task planning from low-level motion control.</li>
+              </ul>
+              <p class="meta"><strong>Technologies:</strong> Hierarchical Reinforcement Learning · Deep Reinforcement Learning · Computer Vision · Inverse Kinematics (IK Control) · CoppeliaSim Simulation · Mobile Manipulation</p>
+            </article>
+          </section>
+        </div>
       </section>
     </div>
   </main>
@@ -52,7 +86,7 @@
     </div>
   </footer>
 
-  <script src="site.js"></script>
+  <script src="site.js?v=20260408"></script>
 </body>
 
 </html>
