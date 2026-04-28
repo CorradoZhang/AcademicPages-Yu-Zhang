@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
     { key: "education", label: "Education", href: "education.html" },
     { key: "publications", label: "Publications", href: "publications.html" },
     { key: "research", label: "Research", href: "research.html" },
+    { key: "projects", label: "Projects", href: "projects.html" },
     // { key: "cv", label: "CV", href: "cv.html" }
   ];
 
