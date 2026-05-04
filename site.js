@@ -1,12 +1,16 @@
 document.addEventListener("DOMContentLoaded", function () {
   var page = document.body.dataset.page || "about";
+  var hideSidebar = document.body.dataset.hideSidebar === "true";
+  var inBlogSubdirectory = window.location.pathname.indexOf("/blogs/") !== -1;
+  var basePath = inBlogSubdirectory ? "../" : "";
 
   var navItems = [
-    { key: "about", label: "About", href: "index.html" },
-    { key: "education", label: "Education", href: "education.html" },
-    { key: "publications", label: "Publications", href: "publications.html" },
-    { key: "research", label: "Research", href: "research.html" },
-    { key: "projects", label: "Projects", href: "projects.html" },
+    { key: "about", label: "About", href: basePath + "index.html" },
+    { key: "education", label: "Education", href: basePath + "education.html" },
+    { key: "publications", label: "Publications", href: basePath + "publications.html" },
+    { key: "research", label: "Research", href: basePath + "research.html" },
+    { key: "projects", label: "Projects", href: basePath + "projects.html" },
+    { key: "blog", label: "Blog", href: basePath + "blog.html" },
     // { key: "cv", label: "CV", href: "cv.html" }
   ];
 
@@ -20,14 +24,14 @@ document.addEventListener("DOMContentLoaded", function () {
     headerHost.innerHTML =
       '<header class="site-header">' +
       '<div class="container">' +
-      '<a class="site-title" href="index.html">Yu Zhang</a>' +
+      '<a class="site-title" href="' + basePath + 'index.html">Yu Zhang</a>' +
       '<nav class="site-nav" aria-label="Primary">' + navHtml + "</nav>" +
       "</div>" +
       "</header>";
   }
 
   var sidebarHost = document.querySelector("[data-profile-sidebar]");
-  if (sidebarHost) {
+  if (sidebarHost && !hideSidebar) {
     var sidebarEducation =
       '<div class="sidebar-section">' +
       '<h3 class="sidebar-section-title">Education</h3>' +
@@ -49,7 +53,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     sidebarHost.innerHTML =
       '<aside class="sidebar" aria-label="Profile">' +
-      '<img class="profile-photo" src="Figures/avatar.png" alt="Yu Zhang" onerror="this.onerror=null;this.src=\'avatar.png\'">' +
+      '<img class="profile-photo" src="' + basePath + 'Figures/avatar.png" alt="Yu Zhang" onerror="this.onerror=null;this.src=\'' + basePath + 'avatar.png\'">' +
       '<h2 class="profile-name">Yu Zhang</h2>' +
       '<p class="profile-title">PhD Student</p>' +
       '<p class="profile-affiliation">University of Galway</p>' +

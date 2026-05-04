@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Yu Zhang | Reinforcement Learning for Robotics: Study and Research Notes</title>
+  <meta name="description" content="Study and research notes on reinforcement learning for robotics.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../styles.css?v=20260408">
+</head>
+
+<body data-page="blog" data-hide-sidebar="true">
+  <div data-site-header></div>
+
+  <main class="page">
+    <div class="container page-grid">
+      <div data-profile-sidebar></div>
+
+      <section class="main-content">
+        <header class="page-heading">
+          <h1>Reinforcement Learning for Robotics: Study and Research Notes</h1>
+          <p>Notes on reinforcement learning foundations, deep RL methods, current research directions, and practical tools for robotics.</p>
+        </header>
+
+        <div class="main-scroll">
+          <article class="content-section blog-article">
+            <p class="blog-back-link"><a href="../blog.html"><i class="fa-solid fa-arrow-left"></i> Back to Blog</a></p>
+
+            <h2 class="section-title"><i class="fa-regular fa-lightbulb"></i>1. Introduction</h2>
+            <hr class="section-divider">
+            <p>This article documents a structured collection of study and research notes on reinforcement learning for robotics. It brings together core learning resources, summaries of important algorithms, and personal reflections developed during the learning process.</p>
+            <ul class="publication-meta-list">
+              <li>A curated collection of learning resources for reinforcement learning, including textbooks, courses, and papers.</li>
+              <li>Structured notes and summaries of key RL concepts and algorithms such as PPO, SAC, and hierarchical reinforcement learning.</li>
+              <li>Personal insights and reflections formed during study and research.</li>
+            </ul>
+            <p class="project-details-label">Main Objectives</p>
+            <ul class="publication-meta-list">
+              <li>Organize high-quality RL learning materials into a clear and structured roadmap.</li>
+              <li>Deepen understanding through summarization and critical reflection.</li>
+              <li>Build a long-term knowledge base for reinforcement learning.</li>
+            </ul>
+
+            <h2 class="section-title"><i class="fa-solid fa-road"></i>2. Learning Roadmap</h2>
+            <hr class="section-divider">
+
+            <h3 class="subsection-title">2.1 Fundamentals</h3>
+            <p><strong>Mathematical Foundation of Reinforcement Learning</strong></p>
+            <p>This resource covers reinforcement learning from fundamental concepts to modern algorithms in a mathematically grounded and structured way. It moves from foundational tools such as MDPs, Bellman equations, and dynamic programming to core methods including Monte Carlo, temporal-difference learning, policy gradients, and actor-critic algorithms.</p>
+            <p>The chapters are strongly connected and are well suited for sequential study, making the book a solid starting point for building systematic understanding.</p>
+            <p class="note">Note: The focus is mainly on theoretical foundations and classical RL methods, rather than newer deep RL algorithms such as DDPG, TD3, PPO, or SAC.</p>
+            <div class="publication-links">
+              <p><span class="publication-link-label">Book:</span> <a href="https://github.com/MathFoundationRL/Book-Mathematical-Foundation-of-Reinforcement-Learning" target="_blank" rel="noreferrer">https://github.com/MathFoundationRL/Book-Mathematical-Foundation-of-Reinforcement-Learning</a></p>
+              <p><span class="publication-link-label">Video:</span> <a href="https://www.youtube.com/watch?v=zJHtM5dN69g&list=PLEhdbSEZZbDaFWPX4gehhwB9vJZJ1DNm8" target="_blank" rel="noreferrer">YouTube Playlist</a></p>
+            </div>
+
+            <p><strong>UC Berkeley CS285: Deep Reinforcement Learning</strong></p>
+            <p>A comprehensive course covering both the fundamentals of deep reinforcement learning and more advanced research topics. The course includes policy gradients, actor-critic methods, Q-learning, model-based RL, imitation learning, offline RL, exploration, transfer learning, and meta-learning.</p>
+            <p>Its combination of theoretical material, programming assignments, and a research-oriented final project makes it especially useful for connecting concepts with implementation.</p>
+            <p class="note">Note: This course assumes prior background in machine learning and basic RL, so it may be demanding for beginners.</p>
+            <div class="publication-links">
+              <p><span class="publication-link-label">Course:</span> <a href="https://rail.eecs.berkeley.edu/deeprlcourse/" target="_blank" rel="noreferrer">https://rail.eecs.berkeley.edu/deeprlcourse/</a></p>
+            </div>
+
+            <div class="publication-links">
+              <p><span class="publication-link-label">DeepMind RL Series:</span> <a href="https://www.youtube.com/watch?v=TCCjZe0y4Qc&list=PLqYmG7hTraZDVH599EItlEWsUOsJbAodm&index=1" target="_blank" rel="noreferrer">YouTube Playlist</a></p>
+              <p><span class="publication-link-label">RL Book:</span> <a href="http://incompleteideas.net/book/the-book-2nd.html" target="_blank" rel="noreferrer">Reinforcement Learning: An Introduction</a></p>
+            </div>
+
+            <h3 class="subsection-title">2.2 Deep Reinforcement Learning</h3>
+            <p>Deep reinforcement learning extends classical RL by incorporating deep neural networks as function approximators, allowing agents to learn from high-dimensional observations such as images and continuous state spaces.</p>
+            <ul class="publication-meta-list">
+              <li><strong>DQN:</strong> <a href="https://www.nature.com/articles/nature14236" target="_blank" rel="noreferrer">Human-level control through deep reinforcement learning</a></li>
+              <li><strong>DDPG:</strong> <a href="https://arxiv.org/abs/1509.02971" target="_blank" rel="noreferrer">Continuous control with deep reinforcement learning</a></li>
+              <li><strong>PPO:</strong> <a href="https://arxiv.org/abs/1707.06347" target="_blank" rel="noreferrer">Proximal Policy Optimization Algorithms</a></li>
+              <li><strong>TD3:</strong> <a href="https://arxiv.org/abs/1802.09477" target="_blank" rel="noreferrer">Addressing Function Approximation Error in Actor-Critic Methods</a></li>
+              <li><strong>SAC:</strong> <a href="https://arxiv.org/abs/1801.01290" target="_blank" rel="noreferrer">Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor</a></li>
+            </ul>
+
+            <h3 class="subsection-title">2.3 New Research Topics</h3>
+            <p>Recent RL research has increasingly focused on improving sample efficiency and data utilization, rather than introducing entirely new algorithmic families. Several directions stand out as especially relevant to robotics.</p>
+            <ul class="publication-meta-list">
+              <li><strong>Offline Reinforcement Learning.</strong> Learning policies from fixed datasets without online interaction, which is especially attractive for safety-critical or expensive robotic systems.
+                <div class="publication-links">
+                  <p><span class="publication-link-label">CQL:</span> <a href="https://arxiv.org/abs/2006.04779" target="_blank" rel="noreferrer">Conservative Q-Learning for Offline Reinforcement Learning</a></p>
+                  <p><span class="publication-link-label">BCQ:</span> <a href="https://arxiv.org/abs/1812.02900" target="_blank" rel="noreferrer">Off-Policy Deep Reinforcement Learning without Exploration</a></p>
+                  <p><span class="publication-link-label">BEAR:</span> <a href="https://arxiv.org/abs/1906.00949" target="_blank" rel="noreferrer">Stabilizing Off-Policy Q-Learning via Bootstrapping Error Reduction</a></p>
+                </div>
+              </li>
+              <li><strong>Model-Based RL and World Models.</strong> Learning system dynamics to support planning and improve sample efficiency, often paired with representation learning.
+                <div class="publication-links">
+                  <p><span class="publication-link-label">PlaNet:</span> <a href="https://arxiv.org/abs/1811.04551" target="_blank" rel="noreferrer">Learning Latent Dynamics for Planning from Pixels</a></p>
+                  <p><span class="publication-link-label">Dreamer:</span> <a href="https://arxiv.org/abs/1912.01603" target="_blank" rel="noreferrer">Dream to Control: Learning Behaviors by Latent Imagination</a></p>
+                </div>
+              </li>
+            </ul>
+
+            <h2 class="section-title"><i class="fa-solid fa-toolbox"></i>3. RL Tools and Frameworks</h2>
+            <hr class="section-divider">
+            <p>This section focuses on tools and libraries that are especially useful for reinforcement learning research and robotics experimentation.</p>
+
+            <h3 class="subsection-title">3.1 RL Libraries</h3>
+            <ul class="publication-meta-list">
+              <li><a href="https://github.com/DLR-RM/stable-baselines3" target="_blank" rel="noreferrer">Stable-Baselines3</a>: Standard implementations of popular RL algorithms such as PPO, SAC, and DQN, widely used for benchmarking and fast prototyping.</li>
+              <li><a href="https://docs.ray.io/en/master/rllib/index.html" target="_blank" rel="noreferrer">RLlib</a>: A scalable RL framework supporting distributed training and multi-agent systems.</li>
+              <li><a href="https://github.com/vwxyzjn/cleanrl" target="_blank" rel="noreferrer">CleanRL</a>: Minimal and transparent implementations that are especially helpful for understanding algorithm details.</li>
+            </ul>
+
+            <h3 class="subsection-title">3.2 Environments and Benchmarks</h3>
+            <ul class="publication-meta-list">
+              <li><a href="https://gymnasium.farama.org/index.html#" target="_blank" rel="noreferrer">Gym / Gymnasium</a>: Standardized interface for RL environments.</li>
+              <li><a href="https://mujoco.org/" target="_blank" rel="noreferrer">MuJoCo</a>: A widely used simulator for continuous control benchmarks.</li>
+              <li><a href="https://github.com/google-deepmind/dm_control" target="_blank" rel="noreferrer">DeepMind Control Suite</a>: Physics-based control tasks for RL research.</li>
+              <li><a href="https://ale.farama.org/index.html" target="_blank" rel="noreferrer">Atari Learning Environment</a>: A classic benchmark suite for evaluating RL algorithms.</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>© <span id="year"></span> Yu Zhang</p>
+    </div>
+  </footer>
+
+  <script src="../site.js?v=20260408"></script>
+</body>
+
+</html>
