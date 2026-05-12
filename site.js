@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
   var page = document.body.dataset.page || "about";
   var hideSidebar = document.body.dataset.hideSidebar === "true";
   var inBlogSubdirectory = window.location.pathname.indexOf("/blogs/") !== -1;
-  var basePath = inBlogSubdirectory ? "../" : "";
+  var basePath = document.body.dataset.basePath || (inBlogSubdirectory ? "../" : "");
 
   var navItems = [
     { key: "about", label: "About", href: basePath + "index.html" },

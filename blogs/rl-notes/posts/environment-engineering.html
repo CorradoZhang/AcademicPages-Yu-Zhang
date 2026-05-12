@@ -1,0 +1,873 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Yu Zhang | RL Engineering in Practice: Building Reinforcement Learning Environments</title>
+  <meta name="description" content="Practical notes on reinforcement learning environment engineering, Gymnasium design, reward functions, and debugging.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../../../styles.css?v=20260513">
+  <script>
+    window.MathJax = { tex: { inlineMath: [['$', '$'], ['\(', '\)']], displayMath: [['$$', '$$'], ['\[', '\]']] }, svg: { fontCache: 'global' } };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+
+<body data-page="blog" data-hide-sidebar="true" data-base-path="../../../">
+  <div data-site-header></div>
+
+  <main class="page">
+    <div class="container page-grid">
+      <div data-profile-sidebar></div>
+
+      <section class="main-content">
+        <header class="page-heading">
+          <h1>RL Engineering in Practice: Building Reinforcement Learning Environments</h1>
+          <p>From Gymnasium APIs to real systems, with a practical focus on environment design, reward engineering, and debugging.</p>
+        </header>
+
+        <div class="main-scroll">
+          <article class="content-section blog-article blog-markdown">
+            <p class="blog-back-link"><a href="../index.html"><i class="fa-solid fa-arrow-left"></i> Back to Notes</a></p>
+            <p align="center">
+  <img src="../assets/RL_environment.png" alt="Reinforcement Learning Environment Engineering">
+</p>
+
+<hr />
+<h1>Introduction</h1>
+<p>Most reinforcement learning tutorials start with:</p>
+<pre><code class="language-python">env = gym.make(...)
+</code></pre>
+<p>but very few explain:</p>
+<ul>
+<li>how RL environments are actually designed</li>
+<li>why reward engineering is difficult</li>
+<li>how observations affect training stability</li>
+<li>why agents exploit environment bugs</li>
+</ul>
+<p>In practice, successful RL experiments depend not only on algorithms, but also on:</p>
+<ul>
+<li>environment engineering</li>
+<li>reward design</li>
+<li>debugging</li>
+<li>experimentation</li>
+</ul>
+<p>This article focuses on the engineering side of reinforcement learning environments. We first discuss the core design decisions behind an environment, then build a minimal <code>GridWorld</code> environment with Gymnasium.</p>
+<p>By the end, you should understand:</p>
+<ul>
+<li>what an RL environment is responsible for</li>
+<li>how observation spaces and action spaces affect learning</li>
+<li>why reward design is often the real bottleneck</li>
+<li>how to implement and debug a custom Gymnasium environment</li>
+</ul>
+<p>The article is organized in two parts:</p>
+<ul>
+<li>Sections 1-5 explain the design principles behind RL environments.</li>
+<li>Section 6 turns those principles into a working <code>GridWorld</code> implementation.</li>
+</ul>
+<hr />
+<h1>1. What Is an RL Environment?</h1>
+<h2>1.1 Agent and Environment</h2>
+<p>In reinforcement learning, the agent interacts with an environment through actions and observations.</p>
+<p>At each timestep:</p>
+<ol>
+<li>the agent receives an observation</li>
+<li>the agent takes an action</li>
+<li>the environment transitions to a new state</li>
+<li>the environment returns a reward</li>
+</ol>
+<p>The transition dynamics can be written as:</p>
+<div class="math-block">$$
+s_{t+1} \sim P(s'|s_t, a_t)
+$$</div>
+<p>The environment defines:</p>
+<ul>
+<li>what the agent can observe</li>
+<li>what actions are allowed</li>
+<li>what rewards are given</li>
+<li>when episodes terminate</li>
+</ul>
+<hr />
+<h2>1.2 Why Environment Design Matters</h2>
+<p>A poorly designed environment can make even the best RL algorithm fail.</p>
+<p>Environment design determines:</p>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Observation Space</td>
+<td>What information the agent has</td>
+</tr>
+<tr>
+<td>Action Space</td>
+<td>What behaviors are possible</td>
+</tr>
+<tr>
+<td>Reward Function</td>
+<td>What the agent optimizes</td>
+</tr>
+<tr>
+<td>Dynamics</td>
+<td>How difficult the task becomes</td>
+</tr>
+</tbody>
+</table>
+<p>In many practical systems:</p>
+<blockquote>
+<p>environment engineering matters more than algorithm choice.</p>
+</blockquote>
+<hr />
+<h1>2. Anatomy of a Gymnasium Environment</h1>
+<p>A Gymnasium environment typically looks like:</p>
+<pre><code class="language-python">class MyEnv(gym.Env):
+</code></pre>
+<p>Core components include:</p>
+<ul>
+<li><code>observation_space</code></li>
+<li><code>action_space</code></li>
+<li><code>reset()</code></li>
+<li><code>step()</code></li>
+<li><code>render()</code></li>
+</ul>
+<p>These pieces form the contract between the learning algorithm and the world it is trying to solve.</p>
+<hr />
+<h2>2.1 Observation Space</h2>
+<p>The observation space defines the format, shape, and valid range of observations returned by the environment.</p>
+<p>Example:</p>
+<pre><code class="language-python">self.observation_space = gym.spaces.Box(
+    low=-1.0,
+    high=1.0,
+    shape=(4,),
+    dtype=np.float32
+)
+</code></pre>
+<p>The observation should:</p>
+<ul>
+<li>contain sufficient task information</li>
+<li>avoid future information leakage</li>
+<li>remain numerically stable</li>
+<li>have normalized scales when possible</li>
+</ul>
+<hr />
+<h2>2.2 Action Space</h2>
+<p>The action space defines what actions the agent can take.</p>
+<p>Discrete actions:</p>
+<pre><code class="language-python">gym.spaces.Discrete(4)
+</code></pre>
+<p>Continuous actions:</p>
+<pre><code class="language-python">gym.spaces.Box(low=-1, high=1, shape=(2,))
+</code></pre>
+<p>Action design strongly affects:</p>
+<ul>
+<li>exploration difficulty</li>
+<li>training stability</li>
+<li>robotics controllability</li>
+</ul>
+<hr />
+<h2>2.3 reset()</h2>
+<p><code>reset()</code> initializes a new episode and returns the first observation.</p>
+<pre><code class="language-python">obs, info = env.reset()
+</code></pre>
+<p>Key considerations:</p>
+<ul>
+<li>initial state distribution</li>
+<li>randomness</li>
+<li>curriculum learning</li>
+<li>reproducibility</li>
+</ul>
+<p>Poor reset logic often causes unstable training because the agent may experience inconsistent starting states.</p>
+<hr />
+<h2>2.4 step(action)</h2>
+<p><code>step(action)</code> is the core environment transition function.</p>
+<pre><code class="language-python">obs, reward, terminated, truncated, info = env.step(action)
+</code></pre>
+<p>Responsibilities include:</p>
+<ul>
+<li>state transition</li>
+<li>reward computation</li>
+<li>termination checking</li>
+<li>logging/debug information</li>
+</ul>
+<p>This function effectively defines the task dynamics.</p>
+<hr />
+<h1>3. Designing Observation Spaces</h1>
+<h2>3.1 What Should Be Observed?</h2>
+<p>The observation is the information available to the agent when it chooses an action.</p>
+<p>A good observation should:</p>
+<ul>
+<li>contain enough information for decision making</li>
+<li>avoid unnecessary noise</li>
+<li>remain consistent across timesteps</li>
+<li>match what would be available in the real task</li>
+</ul>
+<p>Examples:</p>
+<ul>
+<li>robot joint states</li>
+<li>velocities</li>
+<li>target positions</li>
+<li>sensor readings</li>
+</ul>
+<hr />
+<h2>3.2 Common Mistakes</h2>
+<h3>Future Information Leakage</h3>
+<p>The observation accidentally contains information unavailable in reality.</p>
+<p>Example: giving the agent the exact future target position when the real robot would only receive noisy sensor readings.</p>
+<h3>Inconsistent Scaling</h3>
+<p>Some values are extremely large while others are tiny.</p>
+<p>Example: mixing joint angles in radians, pixel coordinates, and raw force values without normalization.</p>
+<h3>Missing Critical States</h3>
+<p>The agent cannot infer necessary task information.</p>
+<p>Example: giving position but not velocity in a task where momentum matters.</p>
+<h3>Partial Observability</h3>
+<p>The environment hides important states.</p>
+<p>Sometimes partial observability is intentional, but then the policy may need memory, frame stacking, or recurrent networks.</p>
+<hr />
+<h2>3.3 Observation Normalization</h2>
+<p>Normalization improves:</p>
+<ul>
+<li>gradient stability</li>
+<li>learning speed</li>
+<li>optimization consistency</li>
+</ul>
+<p>Common approaches:</p>
+<ul>
+<li>mean/std normalization</li>
+<li>clipping</li>
+<li>running statistics</li>
+</ul>
+<hr />
+<h1>4. Designing Action Spaces</h1>
+<h2>4.1 Discrete vs Continuous Actions</h2>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Discrete</td>
+<td>move left/right</td>
+</tr>
+<tr>
+<td>Continuous</td>
+<td>robot torque control</td>
+</tr>
+</tbody>
+</table>
+<p>Discrete action spaces are easier to debug because every action has a clear meaning. Continuous action spaces are more expressive, but they usually make exploration and stabilization harder.</p>
+<hr />
+<h2>4.2 Robotics Action Design</h2>
+<p>Common robotics action spaces include:</p>
+<ul>
+<li>torque control</li>
+<li>velocity control</li>
+<li>position control</li>
+</ul>
+<p>Each introduces different stability and safety constraints.</p>
+<p>As a rule of thumb:</p>
+<ul>
+<li>torque control gives more direct physical control but can be unstable</li>
+<li>velocity control is often easier to learn</li>
+<li>position control is safer and more structured but may limit behavior</li>
+</ul>
+<hr />
+<h2>4.3 Action Clipping</h2>
+<p>Example:</p>
+<pre><code class="language-python">action = np.clip(action, -1.0, 1.0)
+</code></pre>
+<p>Important for:</p>
+<ul>
+<li>physical validity</li>
+<li>numerical stability</li>
+<li>avoiding simulator explosions</li>
+</ul>
+<hr />
+<h1>5. Reward Engineering</h1>
+<p>Reward engineering is one of the hardest parts of RL because the agent optimizes exactly what the reward says, not what the designer intended.</p>
+<hr />
+<h2>5.1 Sparse vs Dense Rewards</h2>
+<p>Sparse reward:</p>
+<pre><code class="language-python">reward = 1 if success else 0
+</code></pre>
+<p>Dense reward:</p>
+<pre><code class="language-python">reward = -distance_to_target
+</code></pre>
+<p>Trade-off:</p>
+<table>
+<thead>
+<tr>
+<th>Sparse</th>
+<th>Dense</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>hard exploration</td>
+<td>easier learning</td>
+</tr>
+<tr>
+<td>cleaner objective</td>
+<td>risk of shortcuts</td>
+</tr>
+</tbody>
+</table>
+<p>Sparse rewards are closer to the real task objective, but they can make exploration extremely difficult. Dense rewards provide more learning signal, but they can accidentally teach the wrong behavior.</p>
+<hr />
+<h2>5.2 Reward Shaping</h2>
+<p>Potential-based shaping:</p>
+<div class="math-block">$$
+F(s,a,s') = \gamma \Phi(s') - \Phi(s)
+$$</div>
+<p>Reward shaping can accelerate learning, but it may introduce unintended behaviors if the shaped reward becomes easier to optimize than the actual task.</p>
+<hr />
+<h2>5.3 Reward Hacking</h2>
+<p>Agents often exploit loopholes in reward functions.</p>
+<p>Examples:</p>
+<ul>
+<li>spinning in circles</li>
+<li>exploiting simulator bugs</li>
+<li>farming unintended rewards</li>
+</ul>
+<p>A rising reward curve does not always mean meaningful behavior.</p>
+<p>For this reason, always inspect behavior visually when possible.</p>
+<hr />
+<h2>5.4 Reward Scaling</h2>
+<p>Improper reward scales may cause:</p>
+<ul>
+<li>exploding Q-values</li>
+<li>unstable gradients</li>
+<li>learning collapse</li>
+</ul>
+<p>Reward normalization is often necessary.</p>
+<p>Good reward scales are usually boring: large enough to create a learning signal, but not so large that value estimates become unstable.</p>
+<hr />
+<h1>6. Building a Minimal Custom Environment: GridWorld</h1>
+<p>To make the environment design concrete, we will build a small <code>GridWorld</code> environment.</p>
+<p>The task is simple:</p>
+<blockquote>
+<p>The agent starts from the top-left corner and tries to reach the goal at the bottom-right corner.</p>
+</blockquote>
+<p>This example is intentionally small. The goal is not to create a difficult benchmark, but to expose every important part of an RL environment in a form that is easy to inspect.</p>
+<p align="center">
+  <img src="../assets/gridworld.png" alt="GridWorld environment example">
+</p>
+
+<hr />
+<h2>6.1 Task Definition</h2>
+<p>We define a small grid world:</p>
+<pre><code class="language-text">S . . .
+. . . .
+. . . .
+. . . G
+</code></pre>
+<p>Where:</p>
+<ul>
+<li><code>S</code> is the start position</li>
+<li><code>G</code> is the goal position</li>
+<li>the agent can move up, down, left, or right</li>
+<li>each step receives a small negative reward</li>
+<li>reaching the goal gives a positive reward</li>
+</ul>
+<p>This environment contains all key components of an RL task:</p>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Design</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Observation</td>
+<td>Agent position</td>
+</tr>
+<tr>
+<td>Action</td>
+<td>Move up/down/left/right</td>
+</tr>
+<tr>
+<td>Reward</td>
+<td>Step penalty + goal reward</td>
+</tr>
+<tr>
+<td>Termination</td>
+<td>Agent reaches goal</td>
+</tr>
+<tr>
+<td>Truncation</td>
+<td>Maximum episode length</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>6.2 Environment Code</h2>
+<p>The full environment is shown below. Notice that most of the work happens inside <code>reset()</code> and <code>step()</code>.</p>
+<pre><code class="language-python">import gymnasium as gym
+from gymnasium import spaces
+import numpy as np
+
+
+class GridWorldEnv(gym.Env):
+    &quot;&quot;&quot;
+    A simple GridWorld environment.
+
+    The agent starts at (0, 0) and needs to reach the goal at
+    (size - 1, size - 1).
+    &quot;&quot;&quot;
+
+    metadata = {&quot;render_modes&quot;: [&quot;human&quot;, &quot;ansi&quot;]}
+
+    def __init__(self, size=4, max_steps=50, render_mode=None):
+        super().__init__()
+
+        self.size = size
+        self.max_steps = max_steps
+        self.render_mode = render_mode
+
+        # Actions:
+        # 0 = up
+        # 1 = down
+        # 2 = left
+        # 3 = right
+        self.action_space = spaces.Discrete(4)
+
+        # Observation:
+        # agent position represented as [row, col]
+        self.observation_space = spaces.Box(
+            low=0,
+            high=size - 1,
+            shape=(2,),
+            dtype=np.int32,
+        )
+
+        self.agent_pos = None
+        self.goal_pos = np.array([size - 1, size - 1], dtype=np.int32)
+        self.steps = 0
+
+    def reset(self, seed=None, options=None):
+        super().reset(seed=seed)
+
+        self.agent_pos = np.array([0, 0], dtype=np.int32)
+        self.steps = 0
+
+        observation = self._get_obs()
+        info = self._get_info()
+
+        return observation, info
+
+    def step(self, action):
+        self.steps += 1
+
+        # Convert action into movement
+        if action == 0:      # up
+            move = np.array([-1, 0])
+        elif action == 1:    # down
+            move = np.array([1, 0])
+        elif action == 2:    # left
+            move = np.array([0, -1])
+        elif action == 3:    # right
+            move = np.array([0, 1])
+        else:
+            raise ValueError(f&quot;Invalid action: {action}&quot;)
+
+        # Update position and keep it inside the grid
+        self.agent_pos = np.clip(
+            self.agent_pos + move,
+            0,
+            self.size - 1,
+        )
+
+        # Check termination
+        terminated = np.array_equal(self.agent_pos, self.goal_pos)
+
+        # Check truncation
+        truncated = self.steps &gt;= self.max_steps
+
+        # Reward design
+        if terminated:
+            reward = 1.0
+        else:
+            reward = -0.01
+
+        observation = self._get_obs()
+        info = self._get_info()
+
+        return observation, reward, terminated, truncated, info
+
+    def render(self):
+        grid = np.full((self.size, self.size), &quot;.&quot;, dtype=str)
+
+        grid[tuple(self.goal_pos)] = &quot;G&quot;
+        grid[tuple(self.agent_pos)] = &quot;A&quot;
+
+        output = &quot;\n&quot;.join(&quot; &quot;.join(row) for row in grid)
+
+        if self.render_mode == &quot;human&quot;:
+            print(output)
+            print()
+        elif self.render_mode == &quot;ansi&quot;:
+            return output
+        else:
+            return output
+
+    def _get_obs(self):
+        return self.agent_pos.copy()
+
+    def _get_info(self):
+        return {
+            &quot;distance_to_goal&quot;: np.linalg.norm(
+                self.agent_pos - self.goal_pos,
+                ord=1,
+            ),
+            &quot;steps&quot;: self.steps,
+        }
+</code></pre>
+<hr />
+<h2>6.3 Running the Environment</h2>
+<p>Before connecting any learning algorithm, run the environment manually or with random actions.</p>
+<pre><code class="language-python">env = GridWorldEnv(size=4, max_steps=20, render_mode=&quot;human&quot;)
+
+obs, info = env.reset(seed=42)
+
+print(&quot;Initial observation:&quot;, obs)
+print(&quot;Initial info:&quot;, info)
+
+terminated = False
+truncated = False
+
+while not terminated and not truncated:
+    action = env.action_space.sample()
+
+    obs, reward, terminated, truncated, info = env.step(action)
+
+    env.render()
+
+    print(&quot;Action:&quot;, action)
+    print(&quot;Observation:&quot;, obs)
+    print(&quot;Reward:&quot;, reward)
+    print(&quot;Terminated:&quot;, terminated)
+    print(&quot;Truncated:&quot;, truncated)
+    print(&quot;Info:&quot;, info)
+    print(&quot;-&quot; * 30)
+</code></pre>
+<hr />
+<h2>6.4 Understanding the Design</h2>
+<h3>Observation</h3>
+<p>The observation is simply the agent position:</p>
+<pre><code class="language-python">[row, col]
+</code></pre>
+<p>For example:</p>
+<pre><code class="language-python">np.array([0, 0])
+</code></pre>
+<p>This is enough because the goal is fixed at the bottom-right corner. If the goal were randomized, the goal position should also be included in the observation.</p>
+<p>In more complex environments, observations may include:</p>
+<ul>
+<li>robot joint positions</li>
+<li>velocities</li>
+<li>camera images</li>
+<li>lidar readings</li>
+<li>target positions</li>
+</ul>
+<hr />
+<h3>Action Space</h3>
+<p>The action space is discrete:</p>
+<pre><code class="language-python">spaces.Discrete(4)
+</code></pre>
+<p>The four actions are:</p>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>0</code></td>
+<td>Up</td>
+</tr>
+<tr>
+<td><code>1</code></td>
+<td>Down</td>
+</tr>
+<tr>
+<td><code>2</code></td>
+<td>Left</td>
+</tr>
+<tr>
+<td><code>3</code></td>
+<td>Right</td>
+</tr>
+</tbody>
+</table>
+<p>This is simple and easy to debug.</p>
+<p>For robotics tasks, the action space is often continuous:</p>
+<pre><code class="language-python">spaces.Box(low=-1.0, high=1.0, shape=(n,))
+</code></pre>
+<p>where each dimension may represent torque, velocity, or position commands.</p>
+<hr />
+<h3>Reward Function</h3>
+<p>The reward is:</p>
+<pre><code class="language-python">reward = 1.0 if goal_reached else -0.01
+</code></pre>
+<p>This means:</p>
+<ul>
+<li>the agent is encouraged to reach the goal</li>
+<li>the agent is slightly penalized for taking too many steps</li>
+</ul>
+<p>This small step penalty encourages shorter paths.</p>
+<p>However, reward design is a trade-off:</p>
+<table>
+<thead>
+<tr>
+<th>Reward Choice</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>+1</code> at goal only</td>
+<td>Sparse reward, harder exploration</td>
+</tr>
+<tr>
+<td><code>-distance_to_goal</code></td>
+<td>Dense reward, easier learning</td>
+</tr>
+<tr>
+<td><code>-0.01</code> per step</td>
+<td>Encourages efficiency</td>
+</tr>
+<tr>
+<td>Large negative collision penalty</td>
+<td>Encourages safety</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3>Terminated vs Truncated</h3>
+<p>Gymnasium separates episode ending into two concepts:</p>
+<pre><code class="language-python">terminated
+truncated
+</code></pre>
+<p><code>terminated=True</code> means the task naturally ended.</p>
+<p>Example:</p>
+<pre><code class="language-python">agent reached the goal
+</code></pre>
+<p><code>truncated=True</code> means the episode was externally cut off.</p>
+<p>Example:</p>
+<pre><code class="language-python">maximum step limit reached
+</code></pre>
+<p>This distinction is important for correct RL training.</p>
+<p>If an episode ends because the task is solved, use <code>terminated=True</code>. If it ends because a time limit is reached, use <code>truncated=True</code>.</p>
+<hr />
+<h2>6.5 Debugging the Environment</h2>
+<p>Before training any RL algorithm, test the environment with a random policy.</p>
+<pre><code class="language-python">env = GridWorldEnv(size=4, max_steps=20)
+
+obs, info = env.reset()
+
+for _ in range(10):
+    action = env.action_space.sample()
+    obs, reward, terminated, truncated, info = env.step(action)
+
+    print({
+        &quot;obs&quot;: obs,
+        &quot;reward&quot;: reward,
+        &quot;terminated&quot;: terminated,
+        &quot;truncated&quot;: truncated,
+        &quot;info&quot;: info,
+    })
+
+    if terminated or truncated:
+        obs, info = env.reset()
+</code></pre>
+<p>Check:</p>
+<ul>
+<li>Does the agent stay inside the grid?</li>
+<li>Does the reward look reasonable?</li>
+<li>Does the episode terminate at the goal?</li>
+<li>Does truncation happen after <code>max_steps</code>?</li>
+<li>Does <code>info</code> contain useful debugging information?</li>
+</ul>
+<p>This step is small but important. If the random policy exposes bugs, a trained policy will usually exploit them even faster.</p>
+<hr />
+<h2>6.6 Environment Design Lessons</h2>
+<p>This GridWorld example demonstrates the core idea of RL environment engineering:</p>
+<blockquote>
+<p>An environment is not just a Python class.
+It defines the world, the task, the feedback signal, and the failure modes.</p>
+</blockquote>
+<p>Even in this simple example, design decisions matter:</p>
+<ul>
+<li>Should the observation include only agent position?</li>
+<li>Should the goal position be included?</li>
+<li>Should the reward be sparse or dense?</li>
+<li>Should invalid moves be penalized?</li>
+<li>Should the initial position be fixed or randomized?</li>
+</ul>
+<p>These choices directly affect learning difficulty.</p>
+<p>A good environment should make these choices explicit instead of hiding them inside implementation details.</p>
+<hr />
+<h2>6.7 Possible Extensions</h2>
+<p>This environment can be extended in many ways:</p>
+<h3>Random Start and Goal</h3>
+<pre><code class="language-python">self.agent_pos = self.np_random.integers(
+    low=0,
+    high=self.size,
+    size=(2,),
+    dtype=np.int32,
+)
+</code></pre>
+<h3>Obstacles</h3>
+<p>Add blocked cells that the agent cannot enter.</p>
+<pre><code class="language-text">S . X .
+. . X .
+. . . .
+X . . G
+</code></pre>
+<h3>Dense Reward</h3>
+<p>Use distance-based reward:</p>
+<pre><code class="language-python">reward = -np.linalg.norm(self.agent_pos - self.goal_pos, ord=1)
+</code></pre>
+<h3>Partial Observability</h3>
+<p>Only show the local neighborhood around the agent.</p>
+<h3>Stochastic Dynamics</h3>
+<p>Make actions sometimes fail:</p>
+<pre><code class="language-python">if self.np_random.random() &lt; 0.1:
+    action = self.action_space.sample()
+</code></pre>
+<p>These extensions make the environment closer to real-world RL problems.</p>
+<p>When extending an environment, add one source of complexity at a time. This makes it much easier to identify which design change caused a training problem.</p>
+<hr />
+<h2>6.8 Environment Registration</h2>
+<p>For larger projects, it is useful to register the custom environment so it can be created with <code>gym.make()</code>.</p>
+<p>Example:</p>
+<pre><code class="language-python">gym.register(
+    id=&quot;CustomGridWorld-v0&quot;,
+    entry_point=&quot;envs.gridworld:GridWorldEnv&quot;,
+)
+</code></pre>
+<p>Then the environment can be created like this:</p>
+<pre><code class="language-python">env = gym.make(&quot;CustomGridWorld-v0&quot;)
+</code></pre>
+<p>Registration is helpful when:</p>
+<ul>
+<li>environments are reused across experiments</li>
+<li>training scripts should not import environment classes directly</li>
+<li>multiple environment variants need consistent names</li>
+<li>benchmark results should be easier to reproduce</li>
+</ul>
+<hr />
+<h2>6.9 A Practical Project Layout</h2>
+<p>As the environment grows, avoid keeping everything in one script. A cleaner structure is:</p>
+<pre><code class="language-text">rl_project/
+|-- envs/
+|   |-- __init__.py
+|   `-- gridworld.py
+|-- train.py
+|-- evaluate.py
+`-- configs/
+    `-- gridworld.yaml
+</code></pre>
+<p>This separation makes it easier to:</p>
+<ul>
+<li>test the environment independently</li>
+<li>reuse the same environment across algorithms</li>
+<li>keep training code separate from environment logic</li>
+<li>add configuration files for different experiments</li>
+</ul>
+<hr />
+<h1>Conclusion</h1>
+<p>Reinforcement learning engineering is not only about algorithms. A well-designed environment is part of the learning system.</p>
+<p>The main lessons from this article are:</p>
+<ul>
+<li>observations define what the agent can know</li>
+<li>actions define what the agent can do</li>
+<li>rewards define what the agent will optimize</li>
+<li>termination and truncation define how episodes end</li>
+<li>debugging should happen before training begins</li>
+</ul>
+<p>In practice, a strong RL algorithm cannot compensate for a broken task definition, misleading reward, unstable observation, or invalid action interface.</p>
+<p>The best way to build environments is to treat them as experimental systems:</p>
+<ul>
+<li>define the task clearly</li>
+<li>make the state and action spaces explicit</li>
+<li>test the environment before training</li>
+<li>inspect behavior, not only reward</li>
+<li>add complexity gradually</li>
+</ul>
+<hr />
+<h1>Appendix A: Gymnasium API Cheatsheet</h1>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>reset()</code></td>
+<td>initialize episode</td>
+</tr>
+<tr>
+<td><code>step()</code></td>
+<td>environment transition</td>
+</tr>
+<tr>
+<td><code>render()</code></td>
+<td>visualization</td>
+</tr>
+<tr>
+<td><code>observation_space</code></td>
+<td>observation definition</td>
+</tr>
+<tr>
+<td><code>action_space</code></td>
+<td>action definition</td>
+</tr>
+<tr>
+<td><code>terminated</code></td>
+<td>natural task ending</td>
+</tr>
+<tr>
+<td><code>truncated</code></td>
+<td>external time cutoff</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1>Appendix B: Further Reading</h1>
+<ul>
+<li>Gymnasium documentation: https://gymnasium.farama.org/</li>
+<li>Stable-Baselines3 documentation: https://stable-baselines3.readthedocs.io/</li>
+<li>MuJoCo documentation: https://mujoco.readthedocs.io/</li>
+<li>Isaac Lab documentation: https://isaac-sim.github.io/IsaacLab/</li>
+</ul>
+          </article>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>© <span id="year"></span> Yu Zhang</p>
+    </div>
+  </footer>
+
+  <script src="../../../site.js?v=20260513"></script>
+</body>
+
+</html>

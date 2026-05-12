@@ -534,6 +534,123 @@ body[data-hide-sidebar="true"] .main-scroll {
   max-width: 860px;
 }
 
+.blog-markdown > :last-child {
+  margin-bottom: 0;
+}
+
+.blog-markdown h1,
+.blog-markdown h2,
+.blog-markdown h3,
+.blog-markdown h4 {
+  font-family: "Source Serif 4", Georgia, "Times New Roman", serif;
+  font-weight: 700;
+  line-height: 1.22;
+}
+
+.blog-markdown h1 {
+  margin: 30px 0 12px;
+  font-size: 1.72rem;
+}
+
+.blog-markdown h2 {
+  margin: 28px 0 12px;
+  font-size: 1.42rem;
+}
+
+.blog-markdown h3 {
+  margin: 22px 0 10px;
+  font-size: 1.14rem;
+}
+
+.blog-markdown h4 {
+  margin: 18px 0 10px;
+  font-size: 1rem;
+}
+
+.blog-markdown p,
+.blog-markdown li {
+  font-size: 0.99rem;
+}
+
+.blog-markdown p {
+  text-align: left;
+}
+
+.blog-markdown ul,
+.blog-markdown ol {
+  margin: 0 0 14px;
+  padding-left: 22px;
+}
+
+.blog-markdown li + li {
+  margin-top: 6px;
+}
+
+.blog-markdown blockquote {
+  margin: 16px 0;
+  padding: 10px 16px;
+  border-left: 3px solid rgba(65, 88, 184, 0.45);
+  background: rgba(238, 241, 255, 0.55);
+  color: #39415e;
+}
+
+.blog-markdown pre {
+  margin: 14px 0 18px;
+  padding: 16px 18px;
+  overflow-x: auto;
+  border: 1px solid rgba(120, 128, 154, 0.22);
+  border-radius: 12px;
+  background: #f7f8fc;
+  line-height: 1.55;
+}
+
+.blog-markdown code {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.92em;
+}
+
+.blog-markdown :not(pre) > code {
+  padding: 0.14em 0.36em;
+  border-radius: 6px;
+  background: #f1f3fa;
+}
+
+.blog-markdown table {
+  width: 100%;
+  margin: 16px 0 20px;
+  border-collapse: collapse;
+  font-size: 0.96rem;
+}
+
+.blog-markdown th,
+.blog-markdown td {
+  padding: 10px 12px;
+  border: 1px solid rgba(120, 128, 154, 0.22);
+  text-align: left;
+  vertical-align: top;
+}
+
+.blog-markdown th {
+  background: #f7f8fc;
+  font-weight: 600;
+}
+
+.blog-markdown img {
+  margin: 14px auto 20px;
+  border: 1px solid var(--line);
+}
+
+.blog-markdown-divider {
+  border: 0;
+  border-top: 1px solid var(--line);
+  margin: 22px 0;
+}
+
+.math-block {
+  margin: 14px 0 18px;
+  overflow-x: auto;
+}
+
 .blog-hero-image {
   margin: 0 0 22px;
 }
