@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Yu Zhang | Imitation Learning: From Expert Demonstrations to Robot Policies</title>
+  <meta name="description" content="A practical introduction to imitation learning for robotics, including behavior cloning, DAgger, inverse reinforcement learning, and generative policies.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../../../styles.css?v=20260725">
+  <script>
+    window.MathJax = { tex: { inlineMath: [['$', '$']], displayMath: [['$$', '$$']] }, svg: { fontCache: 'global' } };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+
+<body data-page="blog" data-hide-sidebar="true" data-base-path="../../../">
+  <div data-site-header></div>
+
+  <main class="page">
+    <div class="container page-grid">
+      <div data-profile-sidebar></div>
+
+      <section class="main-content">
+        <header class="page-heading">
+          <h1>Imitation Learning: From Expert Demonstrations to Robot Policies</h1>
+          <p>How robots learn from demonstrations, why straightforward imitation fails, and how modern methods build more capable policies.</p>
+        </header>
+
+        <div class="main-scroll">
+          <article class="content-section blog-article blog-markdown">
+            <p class="blog-back-link"><a href="../index.html"><i class="fa-solid fa-arrow-left"></i> Back to Imitation Learning Notes</a></p>
+
+            <p class="blog-hero-image">
+              <img src="../assets/imitation-learning-overview.png" alt="Two robotic arms illustrating expert demonstration and learned policy">
+            </p>
+
+            <h1>1. Why Imitation Learning?</h1>
+            <p>Reinforcement learning asks an agent to discover useful behavior through interaction and reward. In robotics, that exploration can be slow, expensive, and unsafe. A physical robot may need thousands of trials, while a poorly specified reward can produce behavior that satisfies the objective without solving the intended task.</p>
+            <p>Imitation learning takes a different starting point: an expert demonstrates the task, and the robot learns a policy from those demonstrations. Instead of specifying every rule or designing a detailed reward function, we provide examples of what successful behavior looks like.</p>
+            <p>This is especially attractive for tasks that are easy for a person to demonstrate but difficult to describe precisely, such as:</p>
+            <ul>
+              <li>grasping and manipulating deformable objects</li>
+              <li>driving through complex traffic interactions</li>
+              <li>coordinating two robot arms</li>
+              <li>performing contact-rich assembly</li>
+              <li>navigating in human environments</li>
+            </ul>
+
+            <h1>2. Problem Formulation</h1>
+            <p>Suppose an expert follows an unknown policy $\pi_E$. We collect a demonstration dataset containing trajectories of observations and actions:</p>
+            <div class="math-block">$$
+              \mathcal{D}_E = \left\{\tau_i\right\}_{i=1}^{N},
+              \qquad
+              \tau_i = \left(o_0, a_0, o_1, a_1, \ldots, o_T\right).
+            $$</div>
+            <p>The learner constructs a policy $\pi_\theta(a \mid o)$ that should reproduce the expert's behavior. Depending on the method, the learner may imitate individual actions, match full trajectory distributions, or infer the objective that explains the demonstrations.</p>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Component</th>
+                  <th>Examples in Robotics</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Observation</td>
+                  <td>Camera images, joint positions, force signals, task goals</td>
+                </tr>
+                <tr>
+                  <td>Action</td>
+                  <td>Joint commands, end-effector poses, gripper commands</td>
+                </tr>
+                <tr>
+                  <td>Demonstration</td>
+                  <td>Teleoperation, kinesthetic teaching, human video</td>
+                </tr>
+                <tr>
+                  <td>Policy</td>
+                  <td>Neural network mapping observations to actions or action sequences</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h1>3. Behavior Cloning</h1>
+            <p>Behavior cloning (BC) is the simplest and most widely used form of imitation learning. It treats imitation as supervised learning: observations are inputs, and expert actions are labels.</p>
+            <p>For continuous control, the policy can be trained by minimizing a regression loss:</p>
+            <div class="math-block">$$
+              \mathcal{L}_{BC}(\theta)
+              =
+              \mathbb{E}_{(o,a)\sim\mathcal{D}_E}
+              \left[
+              \left\|\pi_\theta(o)-a\right\|_2^2
+              \right].
+            $$</div>
+            <p>For discrete actions, cross-entropy is a natural alternative. The training loop is familiar:</p>
+            <pre><code class="language-python">for observations, expert_actions in dataloader:
+    predicted_actions = policy(observations)
+    loss = action_loss(predicted_actions, expert_actions)
+
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()</code></pre>
+            <p>Behavior cloning is appealing because it does not need a reward function or environment interaction during training. With diverse, high-quality data, it can learn surprisingly complex visuomotor skills.</p>
+
+            <h2>3.1 The Multimodal Action Problem</h2>
+            <p>A single observation may admit several correct actions. A robot can pass an obstacle on either side, or grasp an object from several valid directions. A policy trained with mean-squared error may average these modes and produce an action that belongs to none of them.</p>
+            <p>Modern policies address this with expressive conditional distributions, including mixture models, latent-variable models, autoregressive transformers, and diffusion models. The goal is to represent multiple coherent action sequences instead of collapsing them into one average prediction.</p>
+
+            <h1>4. Distribution Shift and Compounding Error</h1>
+            <p>The central weakness of behavior cloning is that training and deployment do not produce the same observation distribution. Training examples come from states visited by the expert. During deployment, the learner visits states generated by its own actions.</p>
+            <p>A small prediction error can move the robot into an unfamiliar state. Because recovery behavior may be absent from the dataset, the next prediction becomes less reliable, causing errors to accumulate over time. This is often called <strong>covariate shift</strong> or <strong>compounding error</strong>.</p>
+            <blockquote>
+              <p>Good one-step prediction accuracy does not guarantee good closed-loop behavior.</p>
+            </blockquote>
+            <p>This distinction explains why validation loss alone is not enough. A policy must be evaluated by rolling it out in the environment and measuring whether it completes the task robustly.</p>
+
+            <h1>5. DAgger: Learning From the Learner's States</h1>
+            <p>Dataset Aggregation (DAgger) addresses distribution shift through an interactive loop. The learner executes its current policy, an expert labels the states that the learner actually visits, and those new examples are added to the training set.</p>
+            <ol>
+              <li>Train an initial policy on expert demonstrations.</li>
+              <li>Roll out the current policy in the environment.</li>
+              <li>Ask the expert for the correct action at visited states.</li>
+              <li>Aggregate the new labels with the existing dataset.</li>
+              <li>Retrain the policy and repeat.</li>
+            </ol>
+            <p>The key idea is simple: train on the distribution induced by the learner, including mistakes and recovery states. This makes the policy more robust, but it requires repeated expert access and careful safety controls during data collection.</p>
+            <div class="publication-links">
+              <p><span class="publication-link-label">Paper:</span> <a href="https://proceedings.mlr.press/v15/ross11a.html" target="_blank" rel="noreferrer">A Reduction of Imitation Learning and Structured Prediction to No-Regret Online Learning</a></p>
+            </div>
+
+            <h1>6. Learning Objectives, Not Only Actions</h1>
+            <p>Behavior cloning asks, "What action would the expert take here?" Another family of methods asks, "What objective would make the demonstrated behavior rational?"</p>
+
+            <h2>6.1 Inverse Reinforcement Learning</h2>
+            <p>Inverse reinforcement learning (IRL) infers a reward or cost function from demonstrations. A policy can then be optimized under that recovered objective. This can generalize beyond the exact demonstrated trajectories, but it introduces an inner reinforcement-learning problem and the inferred reward is generally not unique.</p>
+
+            <h2>6.2 Adversarial Imitation Learning</h2>
+            <p>Generative Adversarial Imitation Learning (GAIL) avoids explicitly recovering a reward function. A discriminator learns to distinguish expert behavior from learner behavior, while the policy learns to make its state-action occupancy resemble the expert's. This matches behavior at the distribution level rather than only matching isolated actions.</p>
+            <div class="publication-links">
+              <p><span class="publication-link-label">Paper:</span> <a href="https://arxiv.org/abs/1606.03476" target="_blank" rel="noreferrer">Generative Adversarial Imitation Learning</a></p>
+            </div>
+
+            <h1>7. Collecting Robot Demonstrations</h1>
+            <p>In practice, data quality often matters as much as the learning algorithm. Demonstrations must expose the relevant states, actions, and task variation while remaining synchronized and reproducible.</p>
+            <table>
+              <thead>
+                <tr>
+                  <th>Collection Method</th>
+                  <th>Strength</th>
+                  <th>Limitation</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Kinesthetic teaching</td>
+                  <td>Direct and intuitive for compliant arms</td>
+                  <td>Limited to robots that can be moved safely</td>
+                </tr>
+                <tr>
+                  <td>Teleoperation</td>
+                  <td>Works for complex and remote tasks</td>
+                  <td>Operator interface can introduce delay and bias</td>
+                </tr>
+                <tr>
+                  <td>Motion capture</td>
+                  <td>Captures natural human movement</td>
+                  <td>Requires retargeting to robot morphology</td>
+                </tr>
+                <tr>
+                  <td>Human video</td>
+                  <td>Large and scalable data source</td>
+                  <td>Actions and robot-compatible state may be missing</td>
+                </tr>
+              </tbody>
+            </table>
+            <p>A useful dataset should include successful task execution, meaningful variation in objects and initial conditions, and recovery behavior. Recording failures can also be valuable when the training method can distinguish preferred from undesirable behavior.</p>
+
+            <h1>8. Modern Sequence Policies</h1>
+            <p>Many manipulation tasks require temporal consistency. Predicting one action at a time can cause jitter and make long-horizon coordination difficult. Recent approaches therefore predict short action sequences or chunks.</p>
+            <ul>
+              <li><strong>Action Chunking with Transformers (ACT)</strong> predicts coherent action segments and uses temporal ensembling for precise bimanual manipulation.</li>
+              <li><strong>Diffusion Policy</strong> models the conditional action distribution as a denoising process, making it well suited to multimodal, high-dimensional actions.</li>
+              <li><strong>Goal-conditioned policies</strong> combine demonstrations with an explicit task or goal representation so one model can perform multiple behaviors.</li>
+            </ul>
+            <div class="publication-links">
+              <p><span class="publication-link-label">ACT:</span> <a href="https://arxiv.org/abs/2304.13705" target="_blank" rel="noreferrer">Learning Fine-Grained Bimanual Manipulation with Low-Cost Hardware</a></p>
+              <p><span class="publication-link-label">Diffusion Policy:</span> <a href="https://arxiv.org/abs/2303.04137" target="_blank" rel="noreferrer">Visuomotor Policy Learning via Action Diffusion</a></p>
+            </div>
+
+            <h1>9. A Practical Evaluation Checklist</h1>
+            <p>Offline prediction metrics are useful for debugging, but the main evaluation should reflect closed-loop task performance.</p>
+            <ul>
+              <li><strong>Task success:</strong> Does the policy complete the full task, not just individual motions?</li>
+              <li><strong>Robustness:</strong> Does it tolerate changes in object pose, lighting, initial state, and sensor noise?</li>
+              <li><strong>Recovery:</strong> Can it return to a useful state after a small mistake?</li>
+              <li><strong>Safety:</strong> Are collisions, excessive forces, and constraint violations tracked explicitly?</li>
+              <li><strong>Generalization:</strong> Are evaluation objects, scenes, and goals separated from the training set?</li>
+              <li><strong>Latency:</strong> Can observations and actions be processed at the control frequency required by the robot?</li>
+            </ul>
+            <p>Evaluation should report results across multiple initial conditions and random seeds. Video is valuable evidence, but aggregate success rates and clearly defined failure categories make comparisons more informative.</p>
+
+            <h1>10. Choosing a Starting Point</h1>
+            <p>A practical progression for a new robotics project is:</p>
+            <ol>
+              <li>Define observations, actions, control frequency, and success criteria.</li>
+              <li>Collect a small, consistent demonstration dataset.</li>
+              <li>Train a behavior-cloning baseline and evaluate it in closed loop.</li>
+              <li>Inspect failures to identify missing state coverage or multimodal actions.</li>
+              <li>Add recovery demonstrations or interactive data collection when distribution shift dominates.</li>
+              <li>Move to sequence or generative policies only when the baseline reveals a clear need.</li>
+            </ol>
+            <p>Imitation learning is not simply supervised learning applied to robots. It is a sequential decision-making problem in which the policy changes the data it will encounter next. The most reliable systems combine good demonstrations, expressive policies, closed-loop evaluation, and deliberate coverage of failure and recovery states.</p>
+          </article>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>© <span id="year"></span> Yu Zhang</p>
+    </div>
+  </footer>
+
+  <script src="../../../site.js?v=20260725"></script>
+</body>
+
+</html>
