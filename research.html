@@ -48,21 +48,25 @@
               <hr class="section-divider">
             </div>
             <article class="project-entry publication-entry-inline">
-              <h3 class="publication-title">Hierarchical Reinforcement Learning for Mobile Manipulation in Simulation</h3>
-              <p class="project-date"><strong>Timeline:</strong> March 2026 - Present</p>
+              <h3 class="publication-title">Human-in-the-Loop Flow Policy Learning for Robotic Manipulation</h3>
+              <p class="project-date"><strong>Timeline:</strong> 2025 - Present</p>
               <p class="publication-authors"><strong>Status:</strong> In progress</p>
               <div class="publication-figure">
-                <img src="Figures/CopSimShot.png" alt="CoppeliaSim mobile manipulation environment for HRL-MM project">
+                <img src="Figures/CopSimShot.png?v=20260902" alt="Human-in-the-loop Flow Policy learning and trajectory recovery workflow for robotic manipulation">
               </div>
-              <p>This project presents a simulation-driven framework for mobile manipulation in cluttered environments, leveraging hierarchical reinforcement learning to decompose complex tasks into structured sub-problems. The system integrates perception, navigation, and manipulation within a unified learning framework, enabling efficient policy learning for long-horizon tasks.</p>
+              <p>This project develops a human-in-the-loop imitation learning framework for robotic manipulation in the Robomimic simulation environment. The system builds upon Flow Matching policies and improves their behavior through uncertainty-aware intervention, human takeover, and online policy adaptation. When the policy fails or enters an uncertain state, a human operator can repair the problematic trajectory segment through a web-based control interface. Successful recovery demonstrations are then incorporated into online training to improve future autonomous performance.</p>
               <p class="project-details-label">Research Details</p>
               <ul class="publication-meta-list">
-                <li>Develops a CoppeliaSim-based simulation environment for mobile manipulation, supporting integrated navigation and grasping in cluttered scenes.</li>
-                <li>Incorporates a vision-based perception module for scene understanding and object localization, enabling the agent to operate in visually complex environments.</li>
-                <li>Constructs a complete inverse kinematics framework for a 6-DoF robotic arm, enabling accurate end-effector position control.</li>
-                <li>Implements a hierarchical reinforcement learning architecture that separates high-level task planning from low-level motion control.</li>
+                <li>Develops a Flow Matching policy for low-dimensional robotic manipulation, generating action sequences from recent robot and object observations.</li>
+                <li>Introduces an intrinsic uncertainty estimator based on the Flow Matching velocity field, using Gaussian mixture modelling to identify inconsistent or multimodal action directions.</li>
+                <li>Implements a budget-constrained human-in-the-loop system that requests human assistance only for selected episodes or high-risk states, while recording the total intervention cost.</li>
+                <li>Provides a browser-based human takeover interface with trajectory playback, multi-view simulation rendering, temporal segment selection, mouse-based Cartesian control, keyboard control, and recovery comparison.</li>
+                <li>Trains a multitask intervention network that predicts both the probability of requiring human assistance and a bounded residual action for correcting the Flow Policy output.</li>
+                <li>Supports iterative trajectory recovery: the operator selects a failure interval, takes control of the robot, and returns control to the Flow Policy from the human-modified state.</li>
+                <li>Performs online imitation learning using a mixture of original Robomimic demonstrations and accepted successful HITL recovery trajectories, reducing catastrophic forgetting during adaptation.</li>
+                <li>Evaluates the method on Robomimic manipulation benchmarks using autonomous success rate, assisted success rate, human-control steps, intervention frequency, uncertainty quality, and post-adaptation performance.</li>
               </ul>
-              <p class="meta"><strong>Technologies:</strong> Hierarchical Reinforcement Learning · Deep Reinforcement Learning · Computer Vision · Inverse Kinematics (IK Control) · CoppeliaSim Simulation · Mobile Manipulation</p>
+              <p class="meta"><strong>Technologies:</strong> Flow Matching · Imitation Learning · Human-in-the-Loop Learning · Uncertainty Estimation · Residual Policy Learning · Online Adaptation · Robomimic · Robosuite · MuJoCo · PyTorch · Web-Based Robot Teleoperation</p>
             </article>
 
             <article class="project-entry publication-entry publication-entry-inline">
